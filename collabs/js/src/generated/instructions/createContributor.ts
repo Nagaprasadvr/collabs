@@ -13,10 +13,23 @@ import * as web3 from '@solana/web3.js'
  * @category CreateContributor
  * @category generated
  */
-export const createContributorStruct = new beet.BeetArgsStruct<{
-  instructionDiscriminator: number[] /* size: 8 */
-}>(
-  [['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)]],
+export type CreateContributorInstructionArgs = {
+  contributorGitName: string
+}
+/**
+ * @category Instructions
+ * @category CreateContributor
+ * @category generated
+ */
+export const createContributorStruct = new beet.FixableBeetArgsStruct<
+  CreateContributorInstructionArgs & {
+    instructionDiscriminator: number[] /* size: 8 */
+  }
+>(
+  [
+    ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
+    ['contributorGitName', beet.utf8String],
+  ],
   'CreateContributorInstructionArgs'
 )
 /**
@@ -25,7 +38,7 @@ export const createContributorStruct = new beet.BeetArgsStruct<{
  * @property [_writable_] contributorAccount
  * @property [_writable_, **signer**] leader
  * @property [] contributor
- * @property [] xpPoolAccount
+ * @property [] gitRepoXpPoolAccount
  * @category Instructions
  * @category CreateContributor
  * @category generated
@@ -34,7 +47,7 @@ export type CreateContributorInstructionAccounts = {
   contributorAccount: web3.PublicKey
   leader: web3.PublicKey
   contributor: web3.PublicKey
-  xpPoolAccount: web3.PublicKey
+  gitRepoXpPoolAccount: web3.PublicKey
   systemProgram?: web3.PublicKey
 }
 
@@ -46,16 +59,20 @@ export const createContributorInstructionDiscriminator = [
  * Creates a _CreateContributor_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
+ * @param args to provide as instruction data to the program
+ *
  * @category Instructions
  * @category CreateContributor
  * @category generated
  */
 export function createCreateContributorInstruction(
   accounts: CreateContributorInstructionAccounts,
+  args: CreateContributorInstructionArgs,
   programId = new web3.PublicKey('4HYr7M3ytiSoqr3Zh3iK1VcNNm7ZgrNikwmWYJdGMvw4')
 ) {
   const [data] = createContributorStruct.serialize({
     instructionDiscriminator: createContributorInstructionDiscriminator,
+    ...args,
   })
   const keys: web3.AccountMeta[] = [
     {
@@ -74,7 +91,7 @@ export function createCreateContributorInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.xpPoolAccount,
+      pubkey: accounts.gitRepoXpPoolAccount,
       isWritable: false,
       isSigner: false,
     },

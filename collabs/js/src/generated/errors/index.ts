@@ -35,6 +35,29 @@ createErrorFromNameLookup.set(
 )
 
 /**
+ * TokenMintMismatch: 'Token mint Mismatch!'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class TokenMintMismatchError extends Error {
+  readonly code: number = 0x1771
+  readonly name: string = 'TokenMintMismatch'
+  constructor() {
+    super('Token mint Mismatch!')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, TokenMintMismatchError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x1771, () => new TokenMintMismatchError())
+createErrorFromNameLookup.set(
+  'TokenMintMismatch',
+  () => new TokenMintMismatchError()
+)
+
+/**
  * Attempts to resolve a custom program error from the provided error code.
  * @category Errors
  * @category generated

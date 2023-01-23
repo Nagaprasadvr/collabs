@@ -8,7 +8,7 @@ collabs = "4HYr7M3ytiSoqr3Zh3iK1VcNNm7ZgrNikwmWYJdGMvw4"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "/home/anonymous/.config/solana/id.json"
 
 [scripts]

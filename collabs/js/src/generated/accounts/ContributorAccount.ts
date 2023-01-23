@@ -16,7 +16,8 @@ import * as beetSolana from '@metaplex-foundation/beet-solana'
  */
 export type ContributorAccountArgs = {
   contributorPubkey: web3.PublicKey
-  xpPoolPubkey: web3.PublicKey
+  contributorGitName: string
+  gitRepoXpPoolPubkey: web3.PublicKey
   xp: beet.bignum
 }
 
@@ -33,7 +34,8 @@ export const contributorAccountDiscriminator = [
 export class ContributorAccount implements ContributorAccountArgs {
   private constructor(
     readonly contributorPubkey: web3.PublicKey,
-    readonly xpPoolPubkey: web3.PublicKey,
+    readonly contributorGitName: string,
+    readonly gitRepoXpPoolPubkey: web3.PublicKey,
     readonly xp: beet.bignum
   ) {}
 
@@ -43,7 +45,8 @@ export class ContributorAccount implements ContributorAccountArgs {
   static fromArgs(args: ContributorAccountArgs) {
     return new ContributorAccount(
       args.contributorPubkey,
-      args.xpPoolPubkey,
+      args.contributorGitName,
+      args.gitRepoXpPoolPubkey,
       args.xp
     )
   }
@@ -115,34 +118,36 @@ export class ContributorAccount implements ContributorAccountArgs {
 
   /**
    * Returns the byteSize of a {@link Buffer} holding the serialized data of
-   * {@link ContributorAccount}
+   * {@link ContributorAccount} for the provided args.
+   *
+   * @param args need to be provided since the byte size for this account
+   * depends on them
    */
-  static get byteSize() {
-    return contributorAccountBeet.byteSize
+  static byteSize(args: ContributorAccountArgs) {
+    const instance = ContributorAccount.fromArgs(args)
+    return contributorAccountBeet.toFixedFromValue({
+      accountDiscriminator: contributorAccountDiscriminator,
+      ...instance,
+    }).byteSize
   }
 
   /**
    * Fetches the minimum balance needed to exempt an account holding
    * {@link ContributorAccount} data from rent
    *
+   * @param args need to be provided since the byte size for this account
+   * depends on them
    * @param connection used to retrieve the rent exemption information
    */
   static async getMinimumBalanceForRentExemption(
+    args: ContributorAccountArgs,
     connection: web3.Connection,
     commitment?: web3.Commitment
   ): Promise<number> {
     return connection.getMinimumBalanceForRentExemption(
-      ContributorAccount.byteSize,
+      ContributorAccount.byteSize(args),
       commitment
     )
-  }
-
-  /**
-   * Determines if the provided {@link Buffer} has the correct byte size to
-   * hold {@link ContributorAccount} data.
-   */
-  static hasCorrectByteSize(buf: Buffer, offset = 0) {
-    return buf.byteLength - offset === ContributorAccount.byteSize
   }
 
   /**
@@ -152,7 +157,8 @@ export class ContributorAccount implements ContributorAccountArgs {
   pretty() {
     return {
       contributorPubkey: this.contributorPubkey.toBase58(),
-      xpPoolPubkey: this.xpPoolPubkey.toBase58(),
+      contributorGitName: this.contributorGitName,
+      gitRepoXpPoolPubkey: this.gitRepoXpPoolPubkey.toBase58(),
       xp: (() => {
         const x = <{ toNumber: () => number }>this.xp
         if (typeof x.toNumber === 'function') {
@@ -172,7 +178,7 @@ export class ContributorAccount implements ContributorAccountArgs {
  * @category Accounts
  * @category generated
  */
-export const contributorAccountBeet = new beet.BeetStruct<
+export const contributorAccountBeet = new beet.FixableBeetStruct<
   ContributorAccount,
   ContributorAccountArgs & {
     accountDiscriminator: number[] /* size: 8 */
@@ -181,7 +187,8 @@ export const contributorAccountBeet = new beet.BeetStruct<
   [
     ['accountDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
     ['contributorPubkey', beetSolana.publicKey],
-    ['xpPoolPubkey', beetSolana.publicKey],
+    ['contributorGitName', beet.utf8String],
+    ['gitRepoXpPoolPubkey', beetSolana.publicKey],
     ['xp', beet.u64],
   ],
   ContributorAccount.fromArgs,

@@ -10,50 +10,61 @@ import * as beet from '@metaplex-foundation/beet'
 import * as beetSolana from '@metaplex-foundation/beet-solana'
 
 /**
- * Arguments used to create {@link XpPoolAccount}
+ * Arguments used to create {@link GitRepoXpPoolAccount}
  * @category Accounts
  * @category generated
  */
-export type XpPoolAccountArgs = {
+export type GitRepoXpPoolAccountArgs = {
   leader: web3.PublicKey
   xp: beet.bignum
+  gitRepoUrl: string
+  totalBonkInStake: beet.bignum
 }
 
-export const xpPoolAccountDiscriminator = [142, 53, 74, 171, 246, 217, 229, 19]
+export const gitRepoXpPoolAccountDiscriminator = [
+  107, 85, 134, 189, 236, 105, 95, 132,
+]
 /**
- * Holds the data for the {@link XpPoolAccount} Account and provides de/serialization
+ * Holds the data for the {@link GitRepoXpPoolAccount} Account and provides de/serialization
  * functionality for that data
  *
  * @category Accounts
  * @category generated
  */
-export class XpPoolAccount implements XpPoolAccountArgs {
+export class GitRepoXpPoolAccount implements GitRepoXpPoolAccountArgs {
   private constructor(
     readonly leader: web3.PublicKey,
-    readonly xp: beet.bignum
+    readonly xp: beet.bignum,
+    readonly gitRepoUrl: string,
+    readonly totalBonkInStake: beet.bignum
   ) {}
 
   /**
-   * Creates a {@link XpPoolAccount} instance from the provided args.
+   * Creates a {@link GitRepoXpPoolAccount} instance from the provided args.
    */
-  static fromArgs(args: XpPoolAccountArgs) {
-    return new XpPoolAccount(args.leader, args.xp)
+  static fromArgs(args: GitRepoXpPoolAccountArgs) {
+    return new GitRepoXpPoolAccount(
+      args.leader,
+      args.xp,
+      args.gitRepoUrl,
+      args.totalBonkInStake
+    )
   }
 
   /**
-   * Deserializes the {@link XpPoolAccount} from the data of the provided {@link web3.AccountInfo}.
+   * Deserializes the {@link GitRepoXpPoolAccount} from the data of the provided {@link web3.AccountInfo}.
    * @returns a tuple of the account data and the offset up to which the buffer was read to obtain it.
    */
   static fromAccountInfo(
     accountInfo: web3.AccountInfo<Buffer>,
     offset = 0
-  ): [XpPoolAccount, number] {
-    return XpPoolAccount.deserialize(accountInfo.data, offset)
+  ): [GitRepoXpPoolAccount, number] {
+    return GitRepoXpPoolAccount.deserialize(accountInfo.data, offset)
   }
 
   /**
    * Retrieves the account info from the provided address and deserializes
-   * the {@link XpPoolAccount} from its data.
+   * the {@link GitRepoXpPoolAccount} from its data.
    *
    * @throws Error if no account info is found at the address or if deserialization fails
    */
@@ -61,15 +72,17 @@ export class XpPoolAccount implements XpPoolAccountArgs {
     connection: web3.Connection,
     address: web3.PublicKey,
     commitmentOrConfig?: web3.Commitment | web3.GetAccountInfoConfig
-  ): Promise<XpPoolAccount> {
+  ): Promise<GitRepoXpPoolAccount> {
     const accountInfo = await connection.getAccountInfo(
       address,
       commitmentOrConfig
     )
     if (accountInfo == null) {
-      throw new Error(`Unable to find XpPoolAccount account at ${address}`)
+      throw new Error(
+        `Unable to find GitRepoXpPoolAccount account at ${address}`
+      )
     }
-    return XpPoolAccount.fromAccountInfo(accountInfo, 0)[0]
+    return GitRepoXpPoolAccount.fromAccountInfo(accountInfo, 0)[0]
   }
 
   /**
@@ -83,62 +96,64 @@ export class XpPoolAccount implements XpPoolAccountArgs {
       '4HYr7M3ytiSoqr3Zh3iK1VcNNm7ZgrNikwmWYJdGMvw4'
     )
   ) {
-    return beetSolana.GpaBuilder.fromStruct(programId, xpPoolAccountBeet)
+    return beetSolana.GpaBuilder.fromStruct(programId, gitRepoXpPoolAccountBeet)
   }
 
   /**
-   * Deserializes the {@link XpPoolAccount} from the provided data Buffer.
+   * Deserializes the {@link GitRepoXpPoolAccount} from the provided data Buffer.
    * @returns a tuple of the account data and the offset up to which the buffer was read to obtain it.
    */
-  static deserialize(buf: Buffer, offset = 0): [XpPoolAccount, number] {
-    return xpPoolAccountBeet.deserialize(buf, offset)
+  static deserialize(buf: Buffer, offset = 0): [GitRepoXpPoolAccount, number] {
+    return gitRepoXpPoolAccountBeet.deserialize(buf, offset)
   }
 
   /**
-   * Serializes the {@link XpPoolAccount} into a Buffer.
+   * Serializes the {@link GitRepoXpPoolAccount} into a Buffer.
    * @returns a tuple of the created Buffer and the offset up to which the buffer was written to store it.
    */
   serialize(): [Buffer, number] {
-    return xpPoolAccountBeet.serialize({
-      accountDiscriminator: xpPoolAccountDiscriminator,
+    return gitRepoXpPoolAccountBeet.serialize({
+      accountDiscriminator: gitRepoXpPoolAccountDiscriminator,
       ...this,
     })
   }
 
   /**
    * Returns the byteSize of a {@link Buffer} holding the serialized data of
-   * {@link XpPoolAccount}
+   * {@link GitRepoXpPoolAccount} for the provided args.
+   *
+   * @param args need to be provided since the byte size for this account
+   * depends on them
    */
-  static get byteSize() {
-    return xpPoolAccountBeet.byteSize
+  static byteSize(args: GitRepoXpPoolAccountArgs) {
+    const instance = GitRepoXpPoolAccount.fromArgs(args)
+    return gitRepoXpPoolAccountBeet.toFixedFromValue({
+      accountDiscriminator: gitRepoXpPoolAccountDiscriminator,
+      ...instance,
+    }).byteSize
   }
 
   /**
    * Fetches the minimum balance needed to exempt an account holding
-   * {@link XpPoolAccount} data from rent
+   * {@link GitRepoXpPoolAccount} data from rent
    *
+   * @param args need to be provided since the byte size for this account
+   * depends on them
    * @param connection used to retrieve the rent exemption information
    */
   static async getMinimumBalanceForRentExemption(
+    args: GitRepoXpPoolAccountArgs,
     connection: web3.Connection,
     commitment?: web3.Commitment
   ): Promise<number> {
     return connection.getMinimumBalanceForRentExemption(
-      XpPoolAccount.byteSize,
+      GitRepoXpPoolAccount.byteSize(args),
       commitment
     )
   }
 
   /**
-   * Determines if the provided {@link Buffer} has the correct byte size to
-   * hold {@link XpPoolAccount} data.
-   */
-  static hasCorrectByteSize(buf: Buffer, offset = 0) {
-    return buf.byteLength - offset === XpPoolAccount.byteSize
-  }
-
-  /**
-   * Returns a readable version of {@link XpPoolAccount} properties
+   * Returns a readable version of {@link GitRepoXpPoolAccount} properties
    * and can be used to convert to JSON and/or logging
    */
   pretty() {
@@ -146,6 +161,18 @@ export class XpPoolAccount implements XpPoolAccountArgs {
       leader: this.leader.toBase58(),
       xp: (() => {
         const x = <{ toNumber: () => number }>this.xp
+        if (typeof x.toNumber === 'function') {
+          try {
+            return x.toNumber()
+          } catch (_) {
+            return x
+          }
+        }
+        return x
+      })(),
+      gitRepoUrl: this.gitRepoUrl,
+      totalBonkInStake: (() => {
+        const x = <{ toNumber: () => number }>this.totalBonkInStake
         if (typeof x.toNumber === 'function') {
           try {
             return x.toNumber()
@@ -163,9 +190,9 @@ export class XpPoolAccount implements XpPoolAccountArgs {
  * @category Accounts
  * @category generated
  */
-export const xpPoolAccountBeet = new beet.BeetStruct<
-  XpPoolAccount,
-  XpPoolAccountArgs & {
+export const gitRepoXpPoolAccountBeet = new beet.FixableBeetStruct<
+  GitRepoXpPoolAccount,
+  GitRepoXpPoolAccountArgs & {
     accountDiscriminator: number[] /* size: 8 */
   }
 >(
@@ -173,7 +200,9 @@ export const xpPoolAccountBeet = new beet.BeetStruct<
     ['accountDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
     ['leader', beetSolana.publicKey],
     ['xp', beet.u64],
+    ['gitRepoUrl', beet.utf8String],
+    ['totalBonkInStake', beet.u64],
   ],
-  XpPoolAccount.fromArgs,
-  'XpPoolAccount'
+  GitRepoXpPoolAccount.fromArgs,
+  'GitRepoXpPoolAccount'
 )

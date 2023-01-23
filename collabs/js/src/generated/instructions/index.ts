@@ -1,3 +1,3 @@
 export * from './createContributor'
-export * from './createXpPool'
+export * from './createGitRepoXpPoolWithStake'
 export * from './transferXpToContributor'

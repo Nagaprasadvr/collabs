@@ -1,7 +1,7 @@
 export * from './ContributorAccount'
-export * from './XpPoolAccount'
+export * from './GitRepoXpPoolAccount'
 
-import { XpPoolAccount } from './XpPoolAccount'
+import { GitRepoXpPoolAccount } from './GitRepoXpPoolAccount'
 import { ContributorAccount } from './ContributorAccount'
 
-export const accountProviders = { XpPoolAccount, ContributorAccount }
+export const accountProviders = { GitRepoXpPoolAccount, ContributorAccount }

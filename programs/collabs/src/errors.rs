@@ -4,4 +4,6 @@ use anchor_lang::prelude::*;
 pub enum CollabsError {
     #[msg("Not Enough Xps to tansfer!")]
     NotEnoughXpsToTransfer,
+    #[msg("Token mint Mismatch!")]
+    TokenMintMismatch,
 }

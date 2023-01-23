@@ -36,7 +36,7 @@ export const transferXpToContributorStruct = new beet.BeetArgsStruct<
  * Accounts required by the _transferXpToContributor_ instruction
  *
  * @property [_writable_] contributorAccount
- * @property [_writable_] xpPoolAccount
+ * @property [_writable_] gitRepoXpPoolAccount
  * @property [**signer**] leader
  * @category Instructions
  * @category TransferXpToContributor
@@ -44,7 +44,7 @@ export const transferXpToContributorStruct = new beet.BeetArgsStruct<
  */
 export type TransferXpToContributorInstructionAccounts = {
   contributorAccount: web3.PublicKey
-  xpPoolAccount: web3.PublicKey
+  gitRepoXpPoolAccount: web3.PublicKey
   leader: web3.PublicKey
 }
 
@@ -78,7 +78,7 @@ export function createTransferXpToContributorInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.xpPoolAccount,
+      pubkey: accounts.gitRepoXpPoolAccount,
       isWritable: true,
       isSigner: false,
     },
