@@ -6,4 +6,6 @@ pub enum CollabsError {
     NotEnoughXpsToTransfer,
     #[msg("Token mint Mismatch!")]
     TokenMintMismatch,
+    #[msg("Xp not Zero cannot Unstake")]
+    CannotUnstake,
 }

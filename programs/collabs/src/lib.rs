@@ -1,9 +1,13 @@
 use anchor_lang::prelude::*;
 mod errors;
-use anchor_spl::{token::transfer, token::Transfer};
+use anchor_spl::{token::close_account, token::transfer, token::CloseAccount, token::Transfer};
 mod ix;
-use ix::{CreateContributorAccount, CreateGitRepoXpPoolAccountWithStake, TransferXPToContributor};
 use ix::{
+    CloseGitRepoXpPoolAccountWithUnStake, CreateContributorAccount,
+    CreateGitRepoXpPoolAccountWithStake, TransferXPToContributor,
+};
+use ix::{
+    __client_accounts_close_git_repo_xp_pool_account_with_un_stake,
     __client_accounts_create_contributor_account,
     __client_accounts_create_git_repo_xp_pool_account_with_stake,
     __client_accounts_transfer_xp_to_contributor,
@@ -15,6 +19,8 @@ declare_id!("4HYr7M3ytiSoqr3Zh3iK1VcNNm7ZgrNikwmWYJdGMvw4");
 
 #[program]
 pub mod collabs {
+    use crate::ix::CloseGitRepoXpPoolAccountWithUnStake;
+
     use super::*;
 
     pub fn create_git_repo_xp_pool_with_stake(
@@ -76,5 +82,38 @@ pub mod collabs {
         git_repo_xp_pool_account.xp -= xp_to_transfer;
         contributor_account.xp += xp_to_transfer;
         Ok(())
+    }
+
+    pub fn close_git_repo_xp_pool_with_unstake(
+        ctx: Context<CloseGitRepoXpPoolAccountWithUnStake>,
+        bump: u8,
+    ) -> Result<()> {
+        let git_repo = &ctx.accounts.git_repo_xp_pool_account;
+        if git_repo.xp == 0 {
+            let bonk_escrow = ctx.accounts.bonk_escrow_token_acc.to_account_info();
+            let leader_token_acc = ctx.accounts.leader_token_acc.to_account_info();
+            let leader = ctx.accounts.leader.to_account_info();
+            let cpi_accounts = CloseAccount {
+                account: bonk_escrow,
+                destination: leader_token_acc,
+                authority: ctx.accounts.bonk_escrow_token_acc.to_account_info(),
+            };
+
+            let cpi_program = ctx.accounts.token_program.to_account_info().clone();
+            let b = [bump.clone()];
+            let seeds_in = vec![
+                "total_bonk_stake".as_bytes(),
+                leader.key.as_ref(),
+                b.as_ref(),
+            ];
+
+            let seed_out = vec![seeds_in.as_slice()];
+            let cpi_ctx =
+                CpiContext::new_with_signer(cpi_program, cpi_accounts, seed_out.as_slice());
+            close_account(cpi_ctx)?;
+            Ok(())
+        } else {
+            return err!(CollabsError::CannotUnstake);
+        }
     }
 }

@@ -1,3 +1,5 @@
+use crate::instruction;
+
 use super::errors::*;
 use super::states::{ContributorAccount, GitRepoXpPoolAccount};
 use anchor_lang::prelude::*;
@@ -39,4 +41,20 @@ pub struct TransferXPToContributor<'info> {
     #[account(mut,has_one = leader)]
     pub git_repo_xp_pool_account: Account<'info, GitRepoXpPoolAccount>,
     pub leader: Signer<'info>,
+}
+
+#[derive(Accounts)]
+#[instruction(bump:u8)]
+pub struct CloseGitRepoXpPoolAccountWithUnStake<'info> {
+    #[account(mut,close=leader)]
+    pub git_repo_xp_pool_account: Account<'info, GitRepoXpPoolAccount>,
+    #[account(mut)]
+    pub leader: Signer<'info>,
+    #[account(mut,close = leader,constraint = leader_token_acc.mint == bonk_mint.key() @CollabsError::TokenMintMismatch)]
+    pub leader_token_acc: Account<'info, TokenAccount>,
+    pub bonk_mint: Account<'info, Mint>,
+    #[account(mut,seeds = ["total_bonk_stake".as_bytes(),leader.key().as_ref()],bump,token::mint = bonk_mint,token::authority = bonk_escrow_token_acc)]
+    pub bonk_escrow_token_acc: Account<'info, TokenAccount>,
+    pub token_program: Program<'info, Token>,
+    pub system_program: Program<'info, System>,
 }
